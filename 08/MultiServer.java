@@ -1,0 +1,46 @@
+// MultiServer.java
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class MultiServer extends Thread {
+    /*Since we can have multiple clients, we need some way to keep track of them. This is provided
+      by line 9 which creates a LinkedList of PrintWriters called clients
+      */
+	private static List<PrintWriter> clients = new LinkedList<PrintWriter>();
+
+	public static void main(String[] args) {
+		try {
+			int port = Integer.parseInt(args[0]);
+			ServerSocket serverSocket = new ServerSocket(port);
+			new MultiServer().start();
+			System.err.println("Waiting for a client to connect");
+			while (true) {
+				Socket socket = serverSocket.accept();
+				synchronized(clients) {
+					clients.add(new PrintWriter(socket.getOutputStream(), true));
+				}
+				System.err.println("Accepted connection on port " + port);
+				new ReadWriteThread(socket.getInputStream(), System.out).start();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("\nUsage: java MultiServer <port>");
+		}
+	}
+
+	public void run() {
+		Scanner stdin = new Scanner(System.in);
+		while (stdin.hasNextLine()) {
+			String line = stdin.nextLine();
+			synchronized(clients) {
+				for (PrintWriter client : clients) {
+					client.println(line);
+				}
+			}
+		}
+	}
+
+}

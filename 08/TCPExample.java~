@@ -1,0 +1,19 @@
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+
+    public class TCPExample {
+        
+            
+            private PrintWriter outpu
+            private BufferedReader input;
+        
+            
+            public TCPExample(Socket socket) throws Exception {
+            
+                output = new PrintWriter(socket.getOutputStream(), true);
+            
+                input =
+                
+                new BufferedReader(new InputStreamReader(socket.getInputStream()));
